@@ -1,0 +1,32 @@
+name: Auto Update Signatures Database
+
+on:
+  schedule:
+    # Запуск каждый день в 03:00 UTC (06:00 МСК)
+    - cron: '0 3 * * *'
+  workflow_dispatch: # Позволяет запускать вручную в 1 клик
+
+permissions:
+  contents: write
+
+jobs:
+  update-db:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Builder Script
+        run: python build_signatures.py
+
+      - name: Commit & Push updated signatures.json
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action Bot"
+          git add signatures.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update signatures [$(date -u +'%Y-%m-%d')]" && git push)
