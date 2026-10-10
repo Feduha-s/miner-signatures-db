@@ -1,0 +1,42 @@
+{
+  "version": "2026.10.10",
+  "lastUpdatedUtc": "2026-10-10 14:59:01",
+  "processSignatures": [
+    "bminer",
+    "cpuminer",
+    "ethminer",
+    "gminer",
+    "lolminer",
+    "nanominer",
+    "nbminer",
+    "phoenixminer",
+    "silentcryptominer",
+    "silentminer",
+    "srbminer",
+    "t-rex",
+    "teamredminer",
+    "wildrig",
+    "xmr-stak",
+    "xmrig"
+  ],
+  "poolSignatures": [
+    "2miners.com",
+    "ethermine.org",
+    "f2pool.com",
+    "hashvault.pro",
+    "minexmr.com",
+    "moneroocean.stream",
+    "nanopool.org",
+    "poolin.me",
+    "stratum+ssl://",
+    "stratum+tcp://",
+    "supportxmr.com",
+    "viabtc.com"
+  ],
+  "fileSignatures": [
+    "WinRing0x64.sys",
+    "config.json",
+    "pools.txt",
+    "xmrig.exe"
+  ]
+}
