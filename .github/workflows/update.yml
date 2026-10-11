@@ -4,7 +4,7 @@ on:
   schedule:
     # Запуск каждый день в 03:00 UTC (06:00 МСК)
     - cron: '0 3 * * *'
-  workflow_dispatch: # Ручной запуск в 1 клик
+  workflow_dispatch: # Запуск вручную
 
 permissions:
   contents: write
@@ -16,7 +16,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          ref: main
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -26,15 +26,8 @@ jobs:
       - name: Run Builder Script
         run: python build_signatures.py
 
-      - name: Commit & Push updated signatures.json
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action Bot"
-          git add signatures.json
-          if ! git diff --cached --quiet; then
-            git commit -m "Auto-update signatures [$(date -u +'%Y-%m-%d')]"
-            git pull --rebase origin main
-            git push origin main
-          else
-            echo "Изменений в signatures.json нет, пуш пропущен."
-          fi
+      - name: Commit and Push signatures.json
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Auto-update signatures database"
+          file_pattern: "signatures.json"
