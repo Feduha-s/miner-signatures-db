@@ -4,7 +4,7 @@ on:
   schedule:
     # Запуск каждый день в 03:00 UTC (06:00 МСК)
     - cron: '0 3 * * *'
-  workflow_dispatch: # Позволяет запускать вручную в 1 клик
+  workflow_dispatch: # Ручной запуск в 1 клик
 
 permissions:
   contents: write
@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -29,4 +31,10 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action Bot"
           git add signatures.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update signatures [$(date -u +'%Y-%m-%d')]" && git push)
+          if ! git diff --cached --quiet; then
+            git commit -m "Auto-update signatures [$(date -u +'%Y-%m-%d')]"
+            git pull --rebase origin main
+            git push origin main
+          else
+            echo "Изменений в signatures.json нет, пуш пропущен."
+          fi
