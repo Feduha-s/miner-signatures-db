@@ -3,28 +3,32 @@ import json
 import re
 from datetime import datetime
 
+# 1. Известные процессы майнеров, стиллеров, RAT и троянов
 STATIC_PROCESSES = [
     # Майнеры
     "xmrig", "xmr-stak", "ethminer", "phoenixminer", "nbminer", "t-rex",
     "gminer", "lolminer", "teamredminer", "nanominer", "cpuminer", 
     "silentminer", "silentcryptominer", "wildrig", "srbminer", "bminer",
-    # Клипперы
+    # Клипперы (подменяют крипто-кошельки)
     "clipper", "autoclip", "cryptoclipper",
-    # Стиллеры и трояны (Lumma, RedLine, AsyncRAT, Warzone, Stealc и др.)
+    # Стиллеры и трояны (Lumma, RedLine, Stealc, AsyncRAT, Warzone, Remcos)
     "redline", "lumma", "stealc", "vidar", "racoon", "asyncrat",
     "remcos", "agenttesla", "njrat", "xworm", "quasar", "dcrat"
 ]
 
+# 2. Характерные файлы
 STATIC_FILES = [
     "xmrig.exe", "WinRing0x64.sys", "config.json", "pools.txt",
     "libcrypto-1_1-x64.dll", "silent.exe", "miner.exe", "stub.exe"
 ]
 
+# 3. Рабочие прямые ссылки на фиды крипто-пулов (без 404)
 POOL_FEEDS = [
-    "https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts",
-    "https://raw.githubusercontent.com/Marf/coinblockerlists/master/hosts"
+    "https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt",
+    "https://raw.githubusercontent.com/mitchellkrogza/CoinBlockerLists/master/hosts"
 ]
 
+# 4. База хэшей вредоносных программ (MalwareBazaar abuse.ch)
 MALWARE_HASH_FEED = "https://bazaar.abuse.ch/export/txt/sha256/recent/"
 
 def fetch_pool_domains():
@@ -51,11 +55,11 @@ def fetch_pool_domains():
                         if re.match(r'^[a-z0-9.-]+\.[a-z]{2,}$', domain):
                             domains.add(domain)
         except Exception as e:
-            print(f"[-] Ошибка загрузки фида {url}: {e}")
+            print(f"[-] Не удалось загрузить фид {url}: {e}")
             
     return sorted(list(domains))
 
-def fetch_malware_hashes(limit=2000):
+def fetch_malware_hashes(limit=2500):
     hashes = set()
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) MinerSearchPro-Bot/1.0"}
     
@@ -68,14 +72,14 @@ def fetch_malware_hashes(limit=2000):
                 line = line.strip()
                 if not line or line.startswith('#'):
                     continue
-                # Валидация 64 символов hex (SHA-256)
+                # Валидация SHA-256 (64 hex-символа)
                 if re.match(r'^[a-fA-F0-9]{64}$', line):
                     hashes.add(line.lower())
                     if len(hashes) >= limit:
                         break
-        print(f"[+] Успешно получено {len(hashes)} хэшей.")
+        print(f"[+] Получено хэшей вирусов: {len(hashes)}")
     except Exception as e:
-        print(f"[-] Ошибка загрузки хэшей MalwareBazaar: {e}")
+        print(f"[-] Предупреждение при загрузке хэшей: {e}")
         
     return sorted(list(hashes))
 
@@ -98,7 +102,7 @@ def main():
     with open("signatures.json", "w", encoding="utf-8") as f:
         json.dump(database, f, indent=2, ensure_ascii=False)
         
-    print(f"[+] Готово! Пулов: {len(pools)}, Хэшей вирусов: {len(virus_hashes)}. Версия: {today_version}")
+    print(f"[+] Успешно! Всего пулов: {len(pools)}, Хэшей вирусов: {len(virus_hashes)}. Версия: {today_version}")
 
 if __name__ == "__main__":
     main()
